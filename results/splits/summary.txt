@@ -1,0 +1,29 @@
+Filas por CSV
+  Training_GroundTruth: 25331
+  Training_Metadata:    25331
+  Test_GroundTruth:     8238
+
+UNK descartadas en train: 0
+Imágenes con lesion_id: 23247 de 25331 (91.8%), lesiones únicas: 11847, imágenes sin lesion_id (grupo propio): 2084
+Assert OK: ningún lesion_id aparece en dos splits
+
+UNK descartadas en test oficial: 2047
+Evaluación externa (test oficial sin UNK): 6191 imágenes
+
+Conteo por clase (porcentaje dentro de cada columna)
+                total           train            val           test  test_official
+class                                                                             
+MEL      4522 (17.9%)    3166 (17.9%)    678 (17.9%)    678 (17.9%)   1327 (21.4%)
+NV      12875 (50.8%)    9015 (50.8%)   1931 (50.8%)   1929 (50.8%)   2495 (40.3%)
+BCC      3323 (13.1%)    2326 (13.1%)    498 (13.1%)    499 (13.1%)    975 (15.7%)
+AK         867 (3.4%)      608 (3.4%)     129 (3.4%)     130 (3.4%)     374 (6.0%)
+BKL      2624 (10.4%)    1837 (10.4%)    393 (10.3%)    394 (10.4%)    660 (10.7%)
+DF         239 (0.9%)      167 (0.9%)      36 (0.9%)      36 (0.9%)      91 (1.5%)
+VASC       253 (1.0%)      178 (1.0%)      37 (1.0%)      38 (1.0%)     104 (1.7%)
+SCC        628 (2.5%)      438 (2.5%)      96 (2.5%)      94 (2.5%)     165 (2.7%)
+TOTAL  25331 (100.0%)  17735 (100.0%)  3798 (100.0%)  3798 (100.0%)  6191 (100.0%)
+Tamaño de cada split respecto al total: train 17735 (70.0%), val 3798 (15.0%), test 3798 (15.0%)
+
+Resoluciones originales en una muestra de 20 imágenes por conjunto (semilla 42)
+  train: 1024x1024: 8, 600x450: 8, 1024x768: 3, 1024x680: 1
+  test oficial: 1024x1024: 13, 600x450: 7
