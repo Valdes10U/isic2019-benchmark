@@ -89,6 +89,8 @@ def main():
     ap.add_argument("--config", required=True)
     ap.add_argument("--seed", type=int, default=None)
     ap.add_argument("--smoke", action="store_true")
+    ap.add_argument("--max-epochs", type=int, default=None)
+    ap.add_argument("--run-name", default=None)
     args = ap.parse_args()
 
     cfg = load_config(args.config)
@@ -97,8 +99,11 @@ def main():
     cfg["smoke_run"] = args.smoke
     if args.smoke:
         cfg["train"]["max_epochs"] = cfg["smoke"]["epochs"]
+    if args.max_epochs is not None:
+        cfg["train"]["max_epochs"] = args.max_epochs
     tag = Path(args.config).stem
-    out = Path(cfg["out_dir"]) / (f"smoke_{tag}" if args.smoke else f"{tag}_seed{cfg['seed']}")
+    name = args.run_name or (f"smoke_{tag}" if args.smoke else f"{tag}_seed{cfg['seed']}")
+    out = Path(cfg["out_dir"]) / name
     out.mkdir(parents=True, exist_ok=True)
     (out / "config.yaml").write_text(yaml.safe_dump(cfg, sort_keys=False, allow_unicode=True))
 
