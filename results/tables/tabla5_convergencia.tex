@@ -1,0 +1,19 @@
+\begin{table*}[t]
+\centering
+\caption{Experimento de convergencia: máximo de 15 contra 30 épocas (semilla 0).}
+\label{tab:tabla5_convergencia}
+\footnotesize
+\begin{tabular}{lcccccccc}
+\toprule
+ & \multicolumn{2}{c}{Época} & \multicolumn{3}{c}{F1 test interno} & \multicolumn{3}{c}{F1 test oficial} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-6} \cmidrule(lr){7-9}
+Modelo & 15 ép. & 30 ép. & 15 ép.  & 30 ép.  & $\Delta$ & 15 ép.   & 30 ép.   & $\Delta$  \\
+\midrule
+ResNet50 & 13 / 15 & 20 / 23 & 53.5 & 54.0 & +0.5 & 51.9 & 53.0 & +1.1 \\
+EfficientNet-B0 & 13 / 15 & 16 / 19 & 53.6 & 54.7 & +1.1 & 51.7 & 52.7 & +1.0 \\
+Swin-T & 10 / 13 & 15 / 18 & 57.2 & 60.3 & +3.1 & 57.9 & 59.1 & +1.2 \\
+\bottomrule
+\end{tabular}
+\par\vspace{2pt}
+\parbox{\linewidth}{\scriptsize Época: época del mejor F1 macro de validación / épocas corridas hasta el early stopping (paciencia 3). F1 macro en porcentaje; $\Delta$ en puntos porcentuales. La corrida de 30 épocas parte de los pesos de ImageNet con el cosine ajustado a 30 épocas, por lo que no es una continuación de la de 15. Una sola semilla: comparar $\Delta$ con la desviación entre semillas de la Tabla 1.}
+\end{table*}

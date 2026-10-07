@@ -1,0 +1,4 @@
+Modelo,F1 macro (interno),F1 pond. (interno),Exact. bal. (interno),Exactitud (interno),AUROC (interno),F1 macro (oficial),Exact. bal. (oficial)
+ResNet50,52.0 ± 1.4,67.1 ± 0.3,56.6 ± 1.7,65.6 ± 0.4,90.7 ± 0.6,51.6 ± 0.9,52.8 ± 1.1
+EfficientNet-B0,53.2 ± 0.5,68.9 ± 0.2,54.1 ± 0.9,68.4 ± 0.3,91.8 ± 0.1,53.0 ± 1.2,52.4 ± 2.1
+Swin-T,58.9 ± 1.5,73.4 ± 0.7,57.7 ± 0.9,73.4 ± 0.8,94.2 ± 0.2,58.5 ± 1.5,55.6 ± 1.7

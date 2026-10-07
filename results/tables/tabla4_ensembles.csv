@@ -1,0 +1,6 @@
+Modelo,F1 macro (interno),Exact. bal. (interno),F1 macro (oficial),Exact. bal. (oficial)
+Swin-T individual (media),58.9 ± 1.5,57.7 ± 0.9,58.5 ± 1.5,55.6 ± 1.7
+EfficientNet-B0 individual (media),53.2 ± 0.5,54.1 ± 0.9,53.0 ± 1.2,52.4 ± 2.1
+Ensemble de arquitecturas (semilla 0),59.3,58.8,58.2,56.6
+Ensemble de semillas Swin-T,60.5,58.5,60.5,57.0
+Ensemble de semillas EfficientNet-B0,56.7,56.8,56.9,55.6

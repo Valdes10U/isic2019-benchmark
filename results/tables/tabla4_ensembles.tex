@@ -1,0 +1,21 @@
+\begin{table*}[t]
+\centering
+\caption{Ensembles por promedio de probabilidades softmax, en porcentaje.}
+\label{tab:tabla4_ensembles}
+\footnotesize
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{Test interno} & \multicolumn{2}{c}{Test oficial} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+Modelo & F1 macro & Exact. bal. & F1 macro  & Exact. bal.  \\
+\midrule
+Swin-T individual (media) & 58.9 $\pm$ 1.5 & 57.7 $\pm$ 0.9 & 58.5 $\pm$ 1.5 & 55.6 $\pm$ 1.7 \\
+EfficientNet-B0 individual (media) & 53.2 $\pm$ 0.5 & 54.1 $\pm$ 0.9 & 53.0 $\pm$ 1.2 & 52.4 $\pm$ 2.1 \\
+Ensemble de arquitecturas (semilla 0) & 59.3 & \textbf{58.8} & 58.2 & 56.6 \\
+Ensemble de semillas Swin-T & \textbf{60.5} & 58.5 & \textbf{60.5} & \textbf{57.0} \\
+Ensemble de semillas EfficientNet-B0 & 56.7 & 56.8 & 56.9 & 55.6 \\
+\bottomrule
+\end{tabular}
+\par\vspace{2pt}
+\parbox{\linewidth}{\scriptsize Ensemble de arquitecturas: ResNet50, EfficientNet-B0 y Swin-T con semilla 0. Ensembles de semillas: las semillas 0, 1 y 2 de una misma arquitectura (control). Ningún ensemble se entrena: se promedian las probabilidades guardadas. Las filas individuales son media $\pm$ desviación estándar entre semillas.}
+\end{table*}

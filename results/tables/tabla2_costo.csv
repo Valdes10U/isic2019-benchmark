@@ -1,0 +1,4 @@
+Modelo,Parámetros (M),GMACs,s/época,Tiempo total (min),VRAM pico (GiB),Inferencia (img/s),Época del mejor F1 val
+ResNet50,23.5,4.1,36.3 ± 2.9,8.6 ± 1.8,1.8,1770,10.7 ± 2.5
+EfficientNet-B0,4.0,0.4,25.4 ± 1.7,6.9 ± 0.4,1.4,3096,12.3 ± 0.6
+Swin-T,27.5,4.5,46.1 ± 1.1,11.0 ± 1.0,2.6,1189,13.0 ± 2.6

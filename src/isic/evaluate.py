@@ -2,6 +2,7 @@
 
 Uso: uv run python -m isic.evaluate --run runs/resnet50_seed0
      uv run python -m isic.evaluate --all
+     uv run python -m isic.evaluate --all --split train   # agrega el bloque train a las 9 corridas principales
 """
 import argparse
 import json
@@ -64,30 +65,39 @@ def training_summary(history_csv):
     }
 
 
+def load_model(run, cfg):
+    ckpt = torch.load(run / "best.pt", map_location="cpu")
+    # sin pesos de ImageNet: se cargan los del checkpoint
+    model = timm.create_model(cfg["model"]["name"], pretrained=False, num_classes=cfg["data"]["num_classes"])
+    model.load_state_dict(ckpt["model"])
+    model.checkpoint_epoch = ckpt["epoch"]
+    return model.cuda().eval()
+
+
+def save_preds(path, df, probs, classes):
+    preds = pd.DataFrame(probs.numpy(), columns=[f"prob_{c}" for c in classes]).round(6)
+    preds.insert(0, "pred", probs.argmax(1).numpy())
+    preds.insert(0, "label", df["label"].values)
+    preds.insert(0, "image", df["image"].values)
+    preds.to_csv(path, index=False)
+
+
 def evaluate_run(run):
     run = Path(run)
     cfg = yaml.safe_load((run / "config.yaml").read_text())
     d, classes = cfg["data"], cfg["data"]["classes"]
-    ckpt = torch.load(run / "best.pt", map_location="cpu")
-    # sin pesos de ImageNet: se cargan los del checkpoint
-    model = timm.create_model(cfg["model"]["name"], pretrained=False, num_classes=d["num_classes"])
-    model.load_state_dict(ckpt["model"])
-    model.cuda().eval()
+    model = load_model(run, cfg)
 
     splits = Path(d["splits_dir"])
     sets = {"test": (splits / "test.csv", d["train_dir"]),
             "test_official": (splits / "test_official.csv", d["test_dir"])}
     result = {"run": run.name, "model": cfg["model"]["name"], "seed": cfg["seed"],
-              "checkpoint_epoch": ckpt["epoch"]}
+              "checkpoint_epoch": model.checkpoint_epoch}
     for name, (csv, img_dir) in sets.items():
         df, probs = predict(model, csv, img_dir, cfg)
         labels = torch.tensor(df["label"].values)
         result[name] = compute_metrics(probs, labels, classes)
-        preds = pd.DataFrame(probs.numpy(), columns=[f"prob_{c}" for c in classes]).round(6)
-        preds.insert(0, "pred", probs.argmax(1).numpy())
-        preds.insert(0, "label", df["label"].values)
-        preds.insert(0, "image", df["image"].values)
-        preds.to_csv(run / f"preds_{name}.csv", index=False)
+        save_preds(run / f"preds_{name}.csv", df, probs, classes)
 
     gt = pd.read_csv(Path(d["root"]) / "ISIC_2019_Test_GroundTruth.csv")
     result["test_official"]["n_unk_excluded"] = int((gt["UNK"] == 1).sum())
@@ -98,13 +108,40 @@ def evaluate_run(run):
           f"(UNK excluidas: {o['n_unk_excluded']})")
 
 
+def evaluate_train(run):
+    """F1 de train con el mejor checkpoint y el transform de val, para la brecha de generalización."""
+    run = Path(run)
+    cfg = yaml.safe_load((run / "config.yaml").read_text())
+    d, classes = cfg["data"], cfg["data"]["classes"]
+    model = load_model(run, cfg)
+    df, probs = predict(model, Path(d["splits_dir"]) / "train.csv", d["train_dir"], cfg)
+    save_preds(run / "preds_train.csv", df, probs, classes)
+    metrics_path = run / "metrics.json"
+    result = json.loads(metrics_path.read_text())
+    result["train"] = compute_metrics(probs, torch.tensor(df["label"].values), classes)
+    metrics_path.write_text(json.dumps(result, indent=2, ensure_ascii=False))
+    print(f"{run.name}: F1 macro train {result['train']['f1_macro']:.4f}, "
+          f"val {result['training']['best_val_f1_macro']:.4f}, test interno {result['test']['f1_macro']:.4f}")
+
+
 def main():
     ap = argparse.ArgumentParser()
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--run")
     g.add_argument("--all", action="store_true")
     ap.add_argument("--runs_dir", default="runs")
+    ap.add_argument("--split", choices=["test", "train"], default="test",
+                    help="test: test interno y oficial; train: bloque train en metrics.json")
     args = ap.parse_args()
+
+    if args.split == "train":
+        # solo las 9 corridas principales (sin _e30 ni ablación)
+        runs = [Path(args.run)] if args.run else sorted(
+            p for p in Path(args.runs_dir).glob("*_seed[0-9]") if (p / "best.pt").exists())
+        print(f"Runs por evaluar en train: {[p.name for p in runs]}")
+        for run in runs:
+            evaluate_train(run)
+        return
 
     if args.run:
         evaluate_run(args.run)

@@ -1,0 +1,22 @@
+\begin{table}[t]
+\centering
+\caption{F1 por clase en el test interno, en porcentaje.}
+\label{tab:tabla3_f1_por_clase}
+\footnotesize
+\begin{tabular}{lcccc}
+\toprule
+Clase & ResNet50 & EfficientNet-B0 & Swin-T & Soporte \\
+\midrule
+MEL & 55.3 $\pm$ 0.3 & 57.7 $\pm$ 0.1 & \textbf{61.6 $\pm$ 1.6} & 678 \\
+NV & 81.1 $\pm$ 0.6 & 82.1 $\pm$ 0.2 & \textbf{85.6 $\pm$ 0.4} & 1929 \\
+BCC & 60.3 $\pm$ 1.7 & 63.9 $\pm$ 0.4 & \textbf{69.1 $\pm$ 0.5} & 499 \\
+AK & 34.1 $\pm$ 2.2 & \textbf{37.6 $\pm$ 2.7} & 37.0 $\pm$ 0.6 & 130 \\
+BKL & 49.9 $\pm$ 0.3 & 53.2 $\pm$ 0.8 & \textbf{62.3 $\pm$ 1.0} & 394 \\
+DF & 39.7 $\pm$ 6.6 & 37.0 $\pm$ 5.3 & \textbf{44.1 $\pm$ 5.8} & 36 \\
+VASC & 62.9 $\pm$ 1.7 & 64.6 $\pm$ 1.4 & \textbf{71.0 $\pm$ 9.0} & 38 \\
+SCC & 33.1 $\pm$ 2.6 & 29.3 $\pm$ 3.9 & \textbf{40.5 $\pm$ 2.8} & 94 \\
+\bottomrule
+\end{tabular}
+\par\vspace{2pt}
+\parbox{\linewidth}{\scriptsize Media $\pm$ desviación estándar muestral entre las semillas 0, 1 y 2. En negritas, el mejor modelo por clase. Soporte: imágenes de cada clase en el test interno. MEL: melanoma; NV: nevo melanocítico; BCC: carcinoma basocelular; AK: queratosis actínica; BKL: queratosis benigna; DF: dermatofibroma; VASC: lesión vascular; SCC: carcinoma escamocelular.}
+\end{table}

@@ -1,0 +1,17 @@
+\begin{table*}[t]
+\centering
+\caption{Costo computacional en una RTX 5070 Ti Laptop (12 GB), entrada de 224x224.}
+\label{tab:tabla2_costo}
+\footnotesize
+\begin{tabular}{lccccccc}
+\toprule
+Modelo & Parámetros (M) & GMACs & s/época & Tiempo total (min) & VRAM pico (GiB) & Inferencia (img/s) & Época del mejor F1 val \\
+\midrule
+ResNet50 & 23.5 & 4.1 & 36.3 $\pm$ 2.9 & 8.6 $\pm$ 1.8 & 1.8 & 1770 & 10.7 $\pm$ 2.5 \\
+EfficientNet-B0 & 4.0 & 0.4 & 25.4 $\pm$ 1.7 & 6.9 $\pm$ 0.4 & 1.4 & 3096 & 12.3 $\pm$ 0.6 \\
+Swin-T & 27.5 & 4.5 & 46.1 $\pm$ 1.1 & 11.0 $\pm$ 1.0 & 2.6 & 1189 & 13.0 $\pm$ 2.6 \\
+\bottomrule
+\end{tabular}
+\par\vspace{2pt}
+\parbox{\linewidth}{\scriptsize GMACs: miles de millones de multiplicaciones-acumulaciones por imagen (fvcore); es lo que la literatura suele reportar como FLOPs (en FLOPs estrictos el valor es el doble). s/época: media de las épocas 2 en adelante (la época 1 incluye la calibración de cuDNN), entrenamiento más validación. Tiempo total: suma de todas las épocas hasta el early stopping. Media $\pm$ desviación estándar muestral entre las semillas 0, 1 y 2. VRAM pico: máximo de torch.cuda.max\_memory\_allocated en entrenamiento con batch 32 y AMP bf16. Inferencia: batch 32 en bf16 con tensores sintéticos (10 batches de calentamiento y 50 medidos).}
+\end{table*}

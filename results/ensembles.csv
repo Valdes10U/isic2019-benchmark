@@ -1,0 +1,7 @@
+ensemble,split,accuracy,f1_macro,f1_weighted,balanced_accuracy,auroc_macro
+arquitecturas_seed0,test,0.73486,0.59348,0.73756,0.58832,0.94307
+arquitecturas_seed0,test_official,0.69003,0.58233,0.69291,0.56561,0.91874
+semillas_swin_t,test,0.75171,0.60496,0.75014,0.58486,0.95051
+semillas_swin_t,test_official,0.70926,0.60467,0.70872,0.57042,0.93035
+semillas_efficientnet_b0,test,0.71696,0.56695,0.71955,0.56775,0.93224
+semillas_efficientnet_b0,test_official,0.67146,0.56884,0.67552,0.55626,0.90668

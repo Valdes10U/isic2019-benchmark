@@ -1,0 +1,26 @@
+\begin{table*}[t]
+\centering
+\caption{Ablación de la ponderación de clases en la pérdida (semilla 0), en porcentaje.}
+\label{tab:tabla6_ablacion_pesos}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lccccccccc}
+\toprule
+ &  & \multicolumn{2}{c}{Test interno} & \multicolumn{2}{c}{Test oficial} & \multicolumn{4}{c}{Clases minoritarias, test interno} \\
+\cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-10}
+Modelo & Ponderación & F1 macro & Exact. bal. & F1 macro  & Exact. bal.  & DF (P / R) & VASC (P / R) & SCC (P / R) & AK (P / R) \\
+\midrule
+ResNet50 & Frecuencia inversa & 53.5 & 58.4 & 51.9 & 53.2 & 40.4 / 52.8 & 58.7 / 71.1 & 29.3 / 45.7 & 26.8 / 46.2 \\
+ & Raíz cuadrada & 53.9 & 54.8 & 51.5 & 50.2 & 27.9 / 33.3 & 68.6 / 63.2 & 35.1 / 36.2 & 36.0 / 49.2 \\
+ & Sin pesos & 52.5 & 48.7 & 46.6 & 43.7 & 75.0 / 16.7 & 90.9 / 52.6 & 26.2 / 18.1 & 38.8 / 34.6 \\
+EfficientNet-B0 & Frecuencia inversa & 53.6 & 53.6 & 51.7 & 50.0 & 50.0 / 36.1 & 65.7 / 60.5 & 25.7 / 30.9 & 40.8 / 37.7 \\
+ & Raíz cuadrada & 51.8 & 51.7 & 51.7 & 50.6 & 33.3 / 22.2 & 66.7 / 63.2 & 29.3 / 38.3 & 36.8 / 30.0 \\
+ & Sin pesos & 51.6 & 49.2 & 51.0 & 48.4 & 38.9 / 19.4 & 72.4 / 55.3 & 33.3 / 27.7 & 39.4 / 28.5 \\
+Swin-T & Frecuencia inversa & 57.2 & 56.7 & 57.9 & 55.7 & 62.5 / 27.8 & 60.5 / 68.4 & 49.3 / 35.1 & 36.1 / 36.9 \\
+ & Raíz cuadrada & 59.9 & 57.8 & 56.7 & 53.7 & 50.0 / 33.3 & 68.6 / 63.2 & 61.8 / 36.2 & 41.7 / 36.9 \\
+ & Sin pesos & 56.5 & 53.3 & 56.6 & 53.1 & 66.7 / 22.2 & 79.3 / 60.5 & 46.4 / 34.0 & 35.0 / 33.1 \\
+\bottomrule
+\end{tabular}
+\par\vspace{2pt}
+\parbox{\linewidth}{\scriptsize Frecuencia inversa: protocolo principal (pesos 1/n, normalizados a media 1). Raíz cuadrada: 1/raíz(n). Sin pesos: cross-entropy estándar. P / R: precisión / recall en el test interno. Todas las variantes con semilla 0 y el resto del protocolo idéntico.}
+\end{table*}
