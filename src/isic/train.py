@@ -91,6 +91,7 @@ def main():
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--max-epochs", type=int, default=None)
     ap.add_argument("--run-name", default=None)
+    ap.add_argument("--class-weight", choices=["inverse", "sqrt_inverse", "none"], default=None)
     args = ap.parse_args()
 
     cfg = load_config(args.config)
@@ -101,6 +102,10 @@ def main():
         cfg["train"]["max_epochs"] = cfg["smoke"]["epochs"]
     if args.max_epochs is not None:
         cfg["train"]["max_epochs"] = args.max_epochs
+    if args.class_weight is not None:
+        cfg["loss"]["class_weight"] = args.class_weight
+    # train.loss es descriptiva; se ajusta para que config.yaml no contradiga los pesos usados
+    cfg["train"]["loss"] = "cross_entropy" if cfg["loss"]["class_weight"] == "none" else "weighted_cross_entropy"
     tag = Path(args.config).stem
     name = args.run_name or (f"smoke_{tag}" if args.smoke else f"{tag}_seed{cfg['seed']}")
     out = Path(cfg["out_dir"]) / name
@@ -115,8 +120,10 @@ def main():
 
     train_loader, val_loader, _ = build_loaders(cfg, smoke=args.smoke)
     model = build_model(cfg["model"]["name"], num_classes).cuda()
-    weights = class_weights(Path(cfg["data"]["splits_dir"]) / "train.csv", num_classes).cuda()
-    criterion = nn.CrossEntropyLoss(weight=weights)
+    mode = cfg["loss"]["class_weight"]
+    weights = class_weights(Path(cfg["data"]["splits_dir"]) / "train.csv", num_classes, mode)
+    print(f"Pesos de clase ({mode}): {None if weights is None else [round(w, 3) for w in weights.tolist()]}")
+    criterion = nn.CrossEntropyLoss(weight=None if weights is None else weights.cuda())
     optimizer = torch.optim.AdamW(model.parameters(), lr=t["lr"], weight_decay=t["weight_decay"])
     steps = len(train_loader)
     scheduler = torch.optim.lr_scheduler.LambdaLR(

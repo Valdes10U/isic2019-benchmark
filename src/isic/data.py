@@ -41,10 +41,17 @@ def build_transforms(train: bool, cfg):
     ])
 
 
-def class_weights(train_csv, num_classes=8):
-    # inversamente proporcionales a la frecuencia, normalizados a media 1
+def class_weights(train_csv, num_classes=8, mode="inverse"):
+    # inverse: 1/frecuencia; sqrt_inverse: 1/raíz de la frecuencia; ambos normalizados a media 1
+    if mode == "none":
+        return None
     counts = np.bincount(pd.read_csv(train_csv)["label"], minlength=num_classes)
-    w = 1.0 / counts
+    if mode == "inverse":
+        w = 1.0 / counts
+    elif mode == "sqrt_inverse":
+        w = 1.0 / np.sqrt(counts)
+    else:
+        raise ValueError(f"Modo de pesos desconocido: {mode}")
     return torch.tensor(w / w.mean(), dtype=torch.float32)
 
 

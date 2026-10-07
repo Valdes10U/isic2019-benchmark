@@ -48,6 +48,9 @@ train:
   cudnn_benchmark: true
   loss: weighted_cross_entropy
 
+loss:
+  class_weight: inverse   # inverse, sqrt_inverse o none
+
 seed: 0
 seeds: [0, 1, 2]
 out_dir: runs

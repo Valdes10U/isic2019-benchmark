@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
-# Estado de la cola principal y de la cola larga (_e30). Uso: bash scripts/status.sh
+# Estado de la cola principal, la cola larga (_e30) y la ablación de pesos (_sqrtw, _now). Uso: bash scripts/status.sh
 cd "$(dirname "$0")/.."
 LOG=runs/run_all.log
 LONG_LOG=runs/run_long.log
+ABL_LOG=runs/run_ablation.log
 tmux has-session -t train 2>/dev/null && alive=1 || alive=0
 tmux has-session -t long 2>/dev/null && long_alive=1 || long_alive=0
+tmux has-session -t ablation 2>/dev/null && abl_alive=1 || abl_alive=0
 
-header() { printf "%-26s %-10s %6s %8s %7s %9s %9s\n" corrida estado epoca f1_val seg f1_test f1_ofic; }
+header() { printf "%-28s %-10s %6s %8s %7s %9s %9s\n" corrida estado epoca f1_val seg f1_test f1_ofic; }
 
 # una fila de la tabla: run, log de su cola, 1 si la sesión de tmux de esa cola está viva
 row() {
@@ -23,7 +25,7 @@ row() {
     if [[ -f "$dir/metrics.json" ]]; then
         read -r ft fo < <(python3 -c "import json,sys; m=json.load(open(sys.argv[1])); print(m['test']['f1_macro'], m['test_official']['f1_macro'])" "$dir/metrics.json")
     fi
-    printf "%-26s %-10s %6s %8s %7s %9s %9s\n" "$run" "$state" "$ep" "$f1" "$sec" "$ft" "$fo"
+    printf "%-28s %-10s %6s %8s %7s %9s %9s\n" "$run" "$state" "$ep" "$f1" "$sec" "$ft" "$fo"
 }
 
 header
@@ -41,12 +43,25 @@ for model in resnet50 efficientnet_b0 swin_t; do
 done
 
 echo
-echo "Sesiones tmux: train $([[ $alive == 1 ]] && echo activa || echo inactiva), long $([[ $long_alive == 1 ]] && echo activa || echo inactiva)"
+echo "Ablación de ponderación de clases (15 épocas, semilla 0):"
+header
+for suffix in sqrtw now; do
+    for model in resnet50 efficientnet_b0 swin_t; do
+        row "${model}_seed0_${suffix}" "$ABL_LOG" "$abl_alive"
+    done
+done
+
+echo
+echo "Sesiones tmux: train $([[ $alive == 1 ]] && echo activa || echo inactiva), long $([[ $long_alive == 1 ]] && echo activa || echo inactiva), ablation $([[ $abl_alive == 1 ]] && echo activa || echo inactiva)"
 echo "Últimas líneas de $LOG:"
 if [[ -f $LOG ]]; then tail -n 5 "$LOG"; else echo "  (la cola no ha arrancado)"; fi
 if [[ -f $LONG_LOG ]]; then
     echo "Últimas líneas de $LONG_LOG:"
     tail -n 5 "$LONG_LOG"
+fi
+if [[ -f $ABL_LOG ]]; then
+    echo "Últimas líneas de $ABL_LOG:"
+    tail -n 5 "$ABL_LOG"
 fi
 echo
 nvidia-smi --query-gpu=utilization.gpu,memory.used,memory.total --format=csv,noheader \
