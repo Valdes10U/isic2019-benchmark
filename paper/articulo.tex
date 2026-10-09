@@ -259,7 +259,44 @@ Con un máximo de 30 épocas (Tabla~\ref{tab:convergencia}), el early stopping c
 
 \subsection{Generalización}
 
-En entrenamiento, ResNet50 llega a 72.0 de F1 macro, EfficientNet-B0 a 90.2 y Swin-T a 95.5, contra 51.8, 56.0 y 60.1 en validación, con brechas de 20, 34 y 35~pp (Figura~\ref{fig:brecha}). Del test interno al oficial, el F1 macro cae 0.4, 0.2 y 0.4~pp, menos que la desviación entre semillas de cada modelo. Las otras métricas sí caen: la exactitud balanceada 3.8, 1.7 y 2.1~pp; la exactitud 3.5, 4.0 y 4.3~pp (de 65.6 a 62.1, de 68.4 a 64.4 y de 73.4 a 69.1), y el AUROC 2.5, 2.6 y 2.2~pp (de 90.7 a 88.2, de 91.8 a 89.2 y de 94.2 a 92.0). El F1 de DF se mueve en sentido contrario y sube en el test oficial: de 39.7 a 48.1 en ResNet50, de 37.0 a 48.6 en EfficientNet-B0 y de 44.1 a 60.8 en Swin-T.
+En entrenamiento, ResNet50 llega a 72.0 de F1 macro, EfficientNet-B0 a 90.2 y Swin-T a 95.5, contra 51.8, 56.0 y 60.1 en validación, con brechas de 20, 34 y 35~pp (Figura~\ref{fig:brecha}). Del test interno al oficial, el F1 macro cae 0.4, 0.2 y 0.4~pp, menos que la desviación entre semillas de cada modelo. Las otras métricas sí caen: la exactitud balanceada 3.8, 1.7 y 2.1~pp; la exactitud 3.5, 4.0 y 4.3~pp (de 65.6 a 62.1, de 68.4 a 64.4 y de 73.4 a 69.1), y el AUROC 2.5, 2.6 y 2.2~pp (de 90.7 a 88.2, de 91.8 a 89.2 y de 94.2 a 92.0). La Tabla~\ref{tab:pr} desglosa la precisión y el recall de las cuatro clases minoritarias en los dos conjuntos.
+
+\begin{table}[!t]
+\centering
+\caption{Precisión y recall de las clases minoritarias en el test interno y en el test oficial, en porcentaje}
+\label{tab:pr}
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{Precisión} & \multicolumn{2}{c}{Recall} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+ & Interno & Oficial & Interno & Oficial \\
+\midrule
+\multicolumn{5}{@{}l}{DF (36 / 91 imágenes; 0.9 / 1.5\%)} \\
+ResNet50 & 36.2 $\pm$ 9.1 & 46.2 $\pm$ 6.5 & 45.4 $\pm$ 7.0 & 50.2 $\pm$ 8.5 \\
+EfficientNet-B0 & 39.0 $\pm$ 11.2 & 53.3 $\pm$ 9.6 & 36.1 $\pm$ 0.0 & 45.8 $\pm$ 5.6 \\
+Swin-T & 56.5 $\pm$ 6.3 & 78.9 $\pm$ 6.3 & 37.0 $\pm$ 8.5 & 49.5 $\pm$ 5.0 \\
+\midrule
+\multicolumn{5}{@{}l}{VASC (38 / 104 imágenes; 1.0 / 1.7\%)} \\
+ResNet50 & 58.2 $\pm$ 1.2 & 64.2 $\pm$ 4.3 & 68.4 $\pm$ 2.6 & 48.4 $\pm$ 0.6 \\
+EfficientNet-B0 & 64.4 $\pm$ 1.2 & 72.1 $\pm$ 1.9 & 64.9 $\pm$ 4.0 & 41.0 $\pm$ 5.8 \\
+Swin-T & 74.5 $\pm$ 15.0 & 83.8 $\pm$ 2.7 & 68.4 $\pm$ 5.3 & 45.8 $\pm$ 4.5 \\
+\midrule
+\multicolumn{5}{@{}l}{SCC (94 / 165 imágenes; 2.5 / 2.7\%)} \\
+ResNet50 & 26.7 $\pm$ 2.5 & 28.1 $\pm$ 2.4 & 44.7 $\pm$ 9.1 & 38.6 $\pm$ 3.9 \\
+EfficientNet-B0 & 29.1 $\pm$ 3.9 & 30.4 $\pm$ 2.8 & 29.8 $\pm$ 4.9 & 35.6 $\pm$ 5.4 \\
+Swin-T & 49.7 $\pm$ 8.3 & 48.8 $\pm$ 5.2 & 34.4 $\pm$ 0.6 & 39.4 $\pm$ 3.4 \\
+\midrule
+\multicolumn{5}{@{}l}{AK (130 / 374 imágenes; 3.4 / 6.0\%)} \\
+ResNet50 & 27.3 $\pm$ 3.1 & 29.4 $\pm$ 0.4 & 45.6 $\pm$ 0.9 & 38.8 $\pm$ 5.8 \\
+EfficientNet-B0 & 35.5 $\pm$ 5.2 & 39.5 $\pm$ 2.1 & 40.5 $\pm$ 3.1 & 41.3 $\pm$ 3.9 \\
+Swin-T & 36.1 $\pm$ 0.1 & 40.9 $\pm$ 5.3 & 37.9 $\pm$ 1.2 & 30.4 $\pm$ 6.6 \\
+\bottomrule
+\end{tabular}
+\par\vspace{2pt}
+\parbox{\columnwidth}{\scriptsize Media $\pm$ desviación estándar muestral entre las semillas 0, 1 y 2, calculadas con la matriz de confusión de cada corrida. Entre paréntesis, imágenes de la clase y su proporción en el test interno / oficial.}
+\end{table}
 
 \begin{table}[!t]
 \centering
@@ -363,7 +400,9 @@ ResNet50 está subajustado. Su F1 macro en entrenamiento es de 72.0, contra 90.2
 
 Los ensembles indican que promediar ayuda más cuando los modelos son parecidos en calidad. El de arquitecturas no supera al de semillas de Swin-T (59.3 contra 60.5) y en el test oficial queda por debajo de Swin-T sola: las dos CNN, más débiles, diluyen al mejor modelo. En el otro extremo, tres EfficientNet-B0 promediados llegan a 56.7 con 1.2 GMACs en total, por encima de un ResNet50 solo (52.0 con 4.1 GMACs). Frente a los ensembles grandes que ganan los retos~\cite{gessert2020isic}, varios modelos chicos promediados son una alternativa razonable cuando el costo de inferencia importa.
 
-La evaluación externa confirma el orden, pero no todas las métricas responden igual al cambio de conjunto. El F1 macro casi no se mueve (0.2 a 0.4~pp), mientras que la exactitud balanceada, la exactitud y el AUROC caen entre 1.7 y 4.3~pp. Parte de la explicación está en la mezcla de clases del test oficial (Sección~III-A): con menos NV (40.3 contra 50.8\%), la clase en la que los tres modelos aciertan más, la exactitud global baja. La mezcla no explica la caída de la exactitud balanceada ni la del AUROC, que no dependen de la proporción de clases, así que en el test oficial los modelos sí reconocen peor cada clase. Mi lectura es que el F1 macro se sostiene porque la precisión de las clases minoritarias mejora cuando son más frecuentes y compensa la pérdida de recall; es consistente con que el F1 de DF, con 91 imágenes en el oficial contra 36 en el interno, suba en los tres modelos, aunque no medí la precisión por clase en ese conjunto. El F1 macro resulta la métrica que menos delata el cambio de conjunto y conviene leerlo junto con la exactitud balanceada. La caída es moderada frente a la que documentan Daneshjou et al.~\cite{daneshjou2022disparities} y no altera el orden entre arquitecturas.
+La evaluación externa confirma el orden, pero no todas las métricas responden igual al cambio de conjunto. El F1 macro casi no se mueve (0.2 a 0.4~pp), mientras que la exactitud balanceada, la exactitud y el AUROC caen entre 1.7 y 4.3~pp. La caída de exactitud coincide con que el test oficial tiene menos NV (40.3 contra 50.8\%), la clase en la que los tres modelos aciertan más. La de exactitud balanceada, que no depende de la proporción de clases, viene de clases concretas: el recall de VASC cae entre 20.0 y 23.9~pp en los tres modelos y el de BKL entre 8.8 y 10.5, mientras que el de MEL, BCC y DF sube (las ocho clases, con su F1, están en \texttt{results/pr\_por\_clase.csv} y \texttt{results/summary.json} del repositorio).
+
+En las cuatro clases minoritarias (Tabla~\ref{tab:pr}) la precisión sube en 11 de los 12 casos. Los aumentos son mayores en AK, DF y VASC, cuya proporción crece de 3.4 a 6.0\%, de 0.9 a 1.5\% y de 1.0 a 1.7\%, y casi nulos en SCC (entre +1.4 y \textminus0.9~pp), cuya proporción solo pasa de 2.5 a 2.7\%. Esa precisión adicional no compensa el recall en todas las clases. En VASC el F1 baja entre 7.8 y 12.5~pp a pesar de ganar entre 6.0 y 9.3~pp de precisión; en DF suben las dos y el F1 gana entre 8.4 y 16.7~pp; en AK y SCC los cambios de F1 son de 3.4~pp o menos y de signo mixto. El F1 macro se sostiene porque las ganancias de MEL y DF se compensan con las pérdidas de VASC y BKL, no porque cada clase conserve su desempeño, y por eso conviene leerlo junto con la exactitud balanceada. La caída es moderada frente a la que documentan Daneshjou et al.~\cite{daneshjou2022disparities} y no altera el orden entre arquitecturas.
 
 La ablación descarta la hipótesis que la motivó. Si la ponderación inversa deprimiera el F1 macro, suavizarla o quitarla debería subirlo, y no ocurre: sin pesos el F1 baja en los tres modelos, y con la raíz cuadrada cambia en direcciones opuestas (+0.4, \textminus1.8 y +2.7~pp). En Swin-T, el 59.9 de la raíz cuadrada iguala a la mejor de sus tres semillas con frecuencia inversa, así que no se distingue del efecto de la semilla. Lo que sí cambia de forma consistente es la exactitud balanceada (Figura~\ref{fig:ablacion}): sin pesos se desploma (ResNet50 pasa de 58.4 a 48.7) mientras la exactitud sube, porque el modelo predice cada vez menos las clases raras. La frecuencia inversa es la mejor o empata en F1 macro del test oficial en los tres modelos (Tabla~\ref{tab:ablacion}) y es la mejor en exactitud balanceada en cuatro de las seis comparaciones. El mecanismo que suponía la hipótesis existe, ya que con pesos el recall de las clases raras sube y su precisión baja, pero los dos efectos se compensan en el F1. El F1 macro bajo de este estudio no se explica por la intensidad de la ponderación.
 
