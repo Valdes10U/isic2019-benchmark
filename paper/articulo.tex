@@ -6,7 +6,6 @@
 \usepackage{pifont}
 \usepackage{cite}
 \usepackage{url}
-\usepackage{xcolor}
 
 \graphicspath{{../figures/}}
 % Colocación de flotantes más permisiva: el artículo tiene 13 tablas y figuras
@@ -19,7 +18,6 @@
 \setcounter{dbltopnumber}{3}
 \setlength{\textfloatsep}{12pt plus 2pt minus 2pt}
 \setlength{\dbltextfloatsep}{12pt plus 2pt minus 2pt}
-\newcommand{\todo}[1]{\textcolor{red}{[#1]}}
 \newcommand{\bien}{\ding{51}}
 \newcommand{\mal}{\ding{55}}
 \newcommand{\gc}[1]{\includegraphics[width=0.1\textwidth]{gradcam/#1.png}}
@@ -33,7 +31,7 @@
 \IEEEauthorblockA{Maestría en Inteligencia Artificial y Ciencia de Datos\\
 Universidad Panamericana\\
 Aguascalientes, México\\
-\todo{correo}}}
+0212570@up.edu.mx}}
 
 \maketitle
 
@@ -68,7 +66,7 @@ Swin-T resulta el mejor modelo por 5.7 puntos porcentuales (pp) de F1 macro, y E
 
 \section{Trabajo relacionado}
 
-ResNet~\cite{he2016resnet} y EfficientNet~\cite{tan2019efficientnet} son las dos familias convolucionales más usadas como base en dermatoscopia. ResNet introdujo las conexiones residuales que permiten entrenar redes profundas, y EfficientNet escala de forma conjunta la profundidad, el ancho y la resolución de la red. El ganador de ISIC 2019 combinó EfficientNets de varias resoluciones con SENet y ResNeXt, una pérdida balanceada, data augmentation fuerte y la metadata del paciente~\cite{gessert2020isic}. Ese tipo de ensemble grande es el estándar de los retos, y es también lo que hace difícil aislar el aporte de cada arquitectura.
+ResNet~\cite{he2016resnet} y EfficientNet~\cite{tan2019efficientnet} son dos de las familias convolucionales más usadas como base en dermatoscopia. ResNet introdujo las conexiones residuales que permiten entrenar redes profundas, y EfficientNet escala de forma conjunta la profundidad, el ancho y la resolución de la red. El ganador de ISIC 2019 combinó EfficientNets de varias resoluciones con SENet y ResNeXt, una pérdida balanceada, data augmentation fuerte y la metadata del paciente~\cite{gessert2020isic}. Ese tipo de ensemble grande es el estándar de los retos, y es también lo que hace difícil aislar el aporte de cada arquitectura.
 
 Del lado de los Transformers, ViT trata la imagen como una secuencia de parches con atención global~\cite{dosovitskiy2021vit}, mientras que Swin agrega una jerarquía de cuatro etapas y restringe la atención a ventanas locales que se desplazan entre capas~\cite{liu2021swin}. Shamshad et al.~\cite{shamshad2023transformers} revisan su adopción en imagen médica. La referencia más directa para este trabajo es la de Matsoukas et al.~\cite{matsoukas2021replace,matsoukas2023pretrained}, que comparan ResNet50 con DeiT-S bajo un mismo protocolo en tres conjuntos médicos, uno de ellos ISIC 2019. Desde cero ganan las CNN por mucho; con pesos de ImageNet la brecha desaparece (en ISIC 2019, recall de 0.810 para ResNet50 contra 0.844 para DeiT-S, mediana de cinco repeticiones), y con preentrenamiento autosupervisado los ViT ganan por poco. Raghu et al.~\cite{raghu2019transfusion} explican por qué los pesos de ImageNet ayudan aun cuando el dominio médico es distinto: más por la inicialización y la escala de los pesos que por la reutilización de características.
 
@@ -108,7 +106,7 @@ Los mapas de Grad-CAM~\cite{selvaraju2017gradcam} se calcularon con la bibliotec
 
 \subsection{Entorno de cómputo}
 
-Todo se corrió en una laptop Lenovo Legion Pro 7i con una GPU RTX 5070 Ti Laptop de 12~GB (arquitectura Blackwell), un procesador Intel Core Ultra 9 275HX y Ubuntu sobre WSL2 con 23~GiB de RAM asignados. El software es PyTorch 2.11.0 con CUDA 12.8 y timm 1.0.30. El código, las configuraciones y las particiones están en el repositorio del proyecto \todo{URL del repositorio}.
+Todo se corrió en una laptop Lenovo Legion Pro 7i con una GPU RTX 5070 Ti Laptop de 12~GB (arquitectura Blackwell), un procesador Intel Core Ultra 9 275HX y Ubuntu sobre WSL2 con 23~GiB de RAM asignados. El software es PyTorch 2.11.0 con CUDA 12.8 y timm 1.0.30. El código, las configuraciones y las particiones están en el repositorio del proyecto, \url{https://github.com/Valdes10U/isic2019-benchmark}.
 
 \section{Resultados}
 
