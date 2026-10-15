@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite it as below."
+title: "isic2019-benchmark: ResNet50, EfficientNet-B0 and Swin-T on ISIC 2019 under one protocol"
+authors:
+  - family-names: "Valdes Uriarte"
+    given-names: "Santiago"
+version: "1.0.0"
+date-released: "2026-10-14"
+url: "https://github.com/Valdes10U/isic2019-benchmark"
+license: MIT
