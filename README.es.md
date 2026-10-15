@@ -114,9 +114,9 @@ Requisitos:
 - Alrededor de 30 GB de disco para los zip, las imágenes, el entorno y los checkpoints.
 - tmux, para lanzar las colas largas.
 
-Los pasos, en orden. Los tiempos son los de la RTX 5070 Ti Laptop y salen de los logs de `results/`; los pasos sin tiempo no quedaron registrados.
+Los pasos, en orden. Los tiempos son los de la RTX 5070 Ti Laptop y salen de los logs de `results/` y de la prueba de reproducibilidad en `results/tiempos_reproduccion.md`; los pasos 2 y 3 no se midieron.
 
-1. Clonar e instalar:
+1. Clonar e instalar (`uv sync` con el caché de uv vacío: 6 min 19 s; `check_gpu.py`: 11 s):
 
    ```bash
    git clone https://github.com/Valdes10U/isic2019-benchmark.git
@@ -141,13 +141,13 @@ Los pasos, en orden. Los tiempos son los de la RTX 5070 Ti Laptop y salen de los
    uv run python scripts/preprocess.py
    ```
 
-4. Generar la partición en `results/splits/`. Con los mismos datos, `git diff --stat results/splits` no debe mostrar cambios:
+4. Generar la partición en `results/splits/`. Con los mismos datos, `git diff --stat results/splits` no debe mostrar cambios (8 s):
 
    ```bash
    uv run python scripts/make_splits.py
    ```
 
-5. Smoke test (500 imágenes de train, 100 de val y una época; escribe en `runs/smoke_resnet50/`). Se puede repetir con `configs/efficientnet_b0.yaml` y `configs/swin_t.yaml`:
+5. Smoke test (500 imágenes de train, 100 de val y una época; escribe en `runs/smoke_resnet50/`). Se puede repetir con `configs/efficientnet_b0.yaml` y `configs/swin_t.yaml`. El primer smoke test en una máquina tarda de 40 a 50 s, pues paga el warmup de cudnn y la lectura de disco sin caché (48 s para ResNet50 y 39 s para EfficientNet-B0; Swin-T, que corrió al final con todo caliente, tardó 9 s):
 
    ```bash
    uv run python -m isic.train --config configs/resnet50.yaml --seed 0 --smoke
@@ -177,18 +177,18 @@ Los pasos, en orden. Los tiempos son los de la RTX 5070 Ti Laptop y salen de los
    bash scripts/status.sh
    ```
 
-10. Análisis, tablas y figuras, en este orden:
+10. Análisis, tablas y figuras, en este orden (2 min 39 s en total, con los checkpoints de las 9 corridas principales en `runs/`):
 
     ```bash
-    uv run python -m isic.evaluate --all --split train   # F1 de train para la brecha de generalización
-    uv run python -m isic.cost                           # results/cost.csv
-    uv run python -m isic.ensemble                       # results/ensembles.csv y ensembles.json
-    uv run python -m isic.gradcam                        # figures/gradcam/ y results/gradcam_images.csv
-    uv run python scripts/pr_por_clase.py                # results/pr_por_clase.csv
-    uv run python scripts/make_figures.py                # results/tables/, figures/ y results/summary.json
+    uv run python -m isic.evaluate --all --split train   # F1 de train para la brecha de generalización (114 s)
+    uv run python -m isic.cost                           # results/cost.csv (28 s)
+    uv run python -m isic.ensemble                       # results/ensembles.csv y ensembles.json (3 s)
+    uv run python -m isic.gradcam                        # figures/gradcam/ y results/gradcam_images.csv (12 s)
+    uv run python scripts/pr_por_clase.py                # results/pr_por_clase.csv (0.1 s)
+    uv run python scripts/make_figures.py                # results/tables/, figures/ y results/summary.json (2 s)
     ```
 
-Las colas escriben sus logs y `env.txt` en `runs/`; los de `results/` son las copias de las corridas reportadas.
+`isic.cost` vuelve a medir el throughput en cada corrida, así que `results/cost.csv` y las tablas y figuras que dependen de él cambian un poco cada vez; `git checkout results figures` restaura las versiones reportadas. Las colas escriben sus logs y `env.txt` en `runs/`; los de `results/` son las copias de las corridas reportadas.
 
 ## Notas de reproducibilidad
 
@@ -196,7 +196,8 @@ Las colas escriben sus logs y `env.txt` en `runs/`; los de `results/` son las co
 - La cola principal corrió con el commit `7fdf47a`, la de convergencia con `efe0280` y la ablación con `df720c8` (primera línea de cada log en `results/`). El código de entrenamiento no ha cambiado desde `df720c8`, y las opciones que agregaron esos commits (`--max-epochs`, `--run-name` y `--class-weight`) conservan el comportamiento original cuando se omiten.
 - La columna GMACs es la salida de fvcore, que cuenta multiplicaciones-acumulaciones; en FLOPs estrictos la cifra es el doble, y `results/cost.csv` trae las dos columnas. fvcore no cuenta algunas operaciones (softmax, GELU y sumas en Swin-T; SiLU, sigmoid y multiplicaciones en EfficientNet-B0; max_pool en ResNet50), por lo que los MACs son una cota inferior ligera.
 - El throughput de inferencia se midió con tensores sintéticos en la GPU, sin DataLoader, con batch 32. Los segundos por época excluyen la primera época.
-- En Windows, el repositorio y los datos van en el sistema de archivos de WSL (ext4) y no en `/mnt/c`, pues leer desde NTFS es varias veces más lento. Dentro de WSL había 23 GiB de RAM y 8 GiB de swap (`results/env.txt`); esos límites se fijan en `%UserProfile%\.wslconfig`, con las claves `memory` y `swap` de la sección `[wsl2]`. Conviene entrenar con la laptop conectada y el modo de energía de Windows en máximo rendimiento: con batería la GPU baja su potencia y los tiempos por época dejan de ser comparables.
+- En Windows, el repositorio y los datos van en el sistema de archivos de WSL (ext4) y no en `/mnt/c`, pues leer desde NTFS es varias veces más lento. `%UserProfile%\.wslconfig` tenía `memory=24GB` y `swap=8GB` en la sección `[wsl2]`, que dentro de WSL se ven como 23 GiB de RAM y 8 GiB de swap (`results/env.txt`).
+- Las corridas se hicieron con la laptop conectada al cargador original (no por USB-C), Lenovo Vantage en modo Performance y Windows en el plan Balanced con Power mode en Best performance. Con la corriente conectada, la suspensión, la hibernación y el apagado del disco estaban en Never, Link State Power Management en Off y la acción al cerrar la tapa en Do nothing. Con otra configuración de energía los tiempos por época pueden no ser comparables.
 
 ## Artículo
 

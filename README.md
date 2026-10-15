@@ -114,9 +114,9 @@ Requirements:
 - About 30 GB of disk for the zip files, the images, the environment and the checkpoints.
 - tmux, to launch the long queues.
 
-The steps, in order. Times are for the RTX 5070 Ti Laptop GPU and come from the logs in `results/`; steps without a time were not logged.
+The steps, in order. Times are for the RTX 5070 Ti Laptop GPU and come from the logs in `results/` and from the reproducibility test in `results/tiempos_reproduccion.md`; steps 2 and 3 were not timed.
 
-1. Clone and install:
+1. Clone and install (`uv sync` with an empty uv cache: 6 min 19 s; `check_gpu.py`: 11 s):
 
    ```bash
    git clone https://github.com/Valdes10U/isic2019-benchmark.git
@@ -141,13 +141,13 @@ The steps, in order. Times are for the RTX 5070 Ti Laptop GPU and come from the 
    uv run python scripts/preprocess.py
    ```
 
-4. Build the split in `results/splits/`. With the same data, `git diff --stat results/splits` should show no changes:
+4. Build the split in `results/splits/`. With the same data, `git diff --stat results/splits` should show no changes (8 s):
 
    ```bash
    uv run python scripts/make_splits.py
    ```
 
-5. Smoke test (500 training images, 100 validation images and one epoch; writes to `runs/smoke_resnet50/`). It can be repeated with `configs/efficientnet_b0.yaml` and `configs/swin_t.yaml`:
+5. Smoke test (500 training images, 100 validation images and one epoch; writes to `runs/smoke_resnet50/`). It can be repeated with `configs/efficientnet_b0.yaml` and `configs/swin_t.yaml`. The first smoke test on a machine takes 40 to 50 s, because it pays for the cudnn warmup and the uncached disk reads (48 s for ResNet50 and 39 s for EfficientNet-B0; Swin-T, run last with everything warm, took 9 s):
 
    ```bash
    uv run python -m isic.train --config configs/resnet50.yaml --seed 0 --smoke
@@ -177,18 +177,18 @@ The steps, in order. Times are for the RTX 5070 Ti Laptop GPU and come from the 
    bash scripts/status.sh
    ```
 
-10. Analysis, tables and figures, in this order:
+10. Analysis, tables and figures, in this order (2 min 39 s in total, with the checkpoints of the 9 main runs in `runs/`):
 
     ```bash
-    uv run python -m isic.evaluate --all --split train   # train F1 for the generalization gap
-    uv run python -m isic.cost                           # results/cost.csv
-    uv run python -m isic.ensemble                       # results/ensembles.csv and ensembles.json
-    uv run python -m isic.gradcam                        # figures/gradcam/ and results/gradcam_images.csv
-    uv run python scripts/pr_por_clase.py                # results/pr_por_clase.csv
-    uv run python scripts/make_figures.py                # results/tables/, figures/ and results/summary.json
+    uv run python -m isic.evaluate --all --split train   # train F1 for the generalization gap (114 s)
+    uv run python -m isic.cost                           # results/cost.csv (28 s)
+    uv run python -m isic.ensemble                       # results/ensembles.csv and ensembles.json (3 s)
+    uv run python -m isic.gradcam                        # figures/gradcam/ and results/gradcam_images.csv (12 s)
+    uv run python scripts/pr_por_clase.py                # results/pr_por_clase.csv (0.1 s)
+    uv run python scripts/make_figures.py                # results/tables/, figures/ and results/summary.json (2 s)
     ```
 
-The queues write their logs and `env.txt` to `runs/`; the files in `results/` are the copies from the reported runs.
+`isic.cost` measures throughput again on every run, so `results/cost.csv` and the tables and figures built from it change slightly with each run; `git checkout results figures` restores the reported versions. The queues write their logs and `env.txt` to `runs/`; the files in `results/` are the copies from the reported runs.
 
 ## Reproducibility notes
 
@@ -196,7 +196,8 @@ The queues write their logs and `env.txt` to `runs/`; the files in `results/` ar
 - The main queue ran on commit `7fdf47a`, the convergence queue on `efe0280` and the ablation on `df720c8` (first line of each log in `results/`). The training code has not changed since `df720c8`, and the options those commits added (`--max-epochs`, `--run-name` and `--class-weight`) keep the original behavior when omitted.
 - The GMACs column is the output of fvcore, which counts multiply-accumulates; in strict FLOPs the number doubles, and `results/cost.csv` has both columns. fvcore does not count some operations (softmax, GELU and additions in Swin-T; SiLU, sigmoid and multiplications in EfficientNet-B0; max_pool in ResNet50), so the MACs are a slight lower bound.
 - Inference throughput was measured with synthetic tensors on the GPU, without a DataLoader, with batch 32. Seconds per epoch exclude the first epoch.
-- On Windows, keep the repository and the data on the WSL file system (ext4) and not under `/mnt/c`, because reading from NTFS is several times slower. Inside WSL there were 23 GiB of RAM and 8 GiB of swap (`results/env.txt`); those limits are set in `%UserProfile%\.wslconfig`, with the `memory` and `swap` keys of the `[wsl2]` section. Train with the laptop plugged in and the Windows power mode on best performance: on battery the GPU lowers its power and the times per epoch are no longer comparable.
+- On Windows, keep the repository and the data on the WSL file system (ext4) and not under `/mnt/c`, because reading from NTFS is several times slower. `%UserProfile%\.wslconfig` had `memory=24GB` and `swap=8GB` in the `[wsl2]` section, which show up inside WSL as 23 GiB of RAM and 8 GiB of swap (`results/env.txt`).
+- The runs were done with the laptop on its original charger (not USB-C), Lenovo Vantage in Performance mode and Windows on the Balanced plan with Power mode set to Best performance. While plugged in, sleep, hibernation and disk turn-off were set to Never, Link State Power Management to Off and the lid close action to Do nothing. With a different power setup the times per epoch may not be comparable.
 
 ## Paper
 
