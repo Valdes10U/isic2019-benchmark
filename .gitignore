@@ -7,3 +7,4 @@ __pycache__/
 .venv/
 .unzip_done
 .DS_Store
+paper/guion.md
